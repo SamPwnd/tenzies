@@ -10,8 +10,8 @@ export default function App() {
     const [tenzies, setTenzies] = React.useState(false)
     const [rolls, setRolls] = React.useState(1)
     const [best, setBest] = React.useState(JSON.parse(localStorage.getItem('best')) || 0)
-    const bestStyle = { color: tenzies ? "#575aff" : 'inherit'}
-    
+    const [highlightBest, setHighlightBest] = React.useState(false);
+
     React.useEffect(() => {
         const allHeld = dice.every(die => die.isHeld)
         const firstValue = dice[0].value
@@ -22,10 +22,15 @@ export default function App() {
             if(rolls < best || best === 0) {
                 localStorage.setItem('best', rolls);
                 setBest(rolls);
+                setHighlightBest(true);
+                setTimeout(() => {
+                    setHighlightBest(false);
+                }, 3000);
             }
         }
     }, [dice])
 
+    
     function generateNewDie() {
         return {
             value: Math.ceil(Math.random() * 6),
@@ -73,8 +78,9 @@ export default function App() {
     ))
     
     return (
+        <>
+        {tenzies && <Confetti />}
         <main>
-            {tenzies && <Confetti />}
             <h1 className="title">Tenzies!</h1>
             <p className="instructions">Roll until all dice are the same.<br></br>
             Click each die to freeze it at its current value between rolls.</p>
@@ -83,7 +89,7 @@ export default function App() {
             </div>
             <div className="records">
                 <p className="rolls-counter">Rolls: {rolls}</p>
-                <p style={bestStyle}>Best: {best}</p>
+                <p style={highlightBest ? {color: '#575aff'} : {color: 'inherit'}}>Best: {best}</p>
             </div>
             
             <button 
@@ -93,5 +99,6 @@ export default function App() {
                 {tenzies ? "New Game" : "Roll"}
             </button>
         </main>
+        </>
     )
 }
